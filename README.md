@@ -6,7 +6,12 @@ This module is utilizing the expressiveness and conciseness of [RxJS](https://gi
 
 ## Installation
 
-Install from GitHub:
+Install from npm:
+```
+npm install snow-flux
+```
+
+Or, install from GitHub:
 ```
 npm install modesty/snow-flux
 ```
