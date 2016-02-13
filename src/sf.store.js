@@ -28,17 +28,26 @@ function StoreBase(store_data, default_act, ext_methods) {
 StoreBase.prototype = {
 	constructor: StoreBase,
 
+	/**
+	invoke explicitly to enable Undo/Redo
+	*/
 	init() {
 		this.enableUndoRedo(true);
 		this.streamChange();
 	},
 
+	/**
+	listen to store state changes, returns Rx subscription
+	*/
 	subscribe(fn, context) {
 		return this._storeSubject.subscribe( (payload) => {
 			fn.apply(context, [payload]);
 		});
 	},
 
+	/**
+	dispose the subscription returned from subscribe call
+	*/
 	dispose(subscription) {
 		if (subscription) {
 			subscription.dispose();
@@ -48,6 +57,9 @@ StoreBase.prototype = {
 		}
 	},
 
+	/**
+	wrap the onNext to enbale history cache for Undo/redo
+	*/
 	streamChange() {
 		// always remember the initial state, in case 'cancel'
 		if (this.undoRedoSub || this._historyIndex < 0) {
@@ -60,23 +72,26 @@ StoreBase.prototype = {
 	/**
 	 * bind action to self, only once
 	 */
-		registerAction(actObj, actType, actFn) {
+	registerAction(actObj, actType, actFn) {
 		if (!this._subs[actType]) {
 			this._subs[actType] = actObj.subscribe(actType, actFn, this);
 		}
 	},
 
+	/**
+	unregister a listening function by type
+	*/
 	unRegisterAction(actObj, actType) {
 		if (this._subs[actType]) {
 			actObj.dispose(this._sub[actType]);
-			this._subs[actType] = null;
+			delete this._subs[actType];
 		}
 	},
 
 	/**
-	 * bind default action to function *outside* or *inside* store
+	 * bind default action to function *outside* store
 	 */
-		bindAction(actType, actFn, actContext) {
+	bindAction(actType, actFn, actContext) {
 		if (!this.action) {
 			console.warn("StoreBase: missing default action, no call outside of the store.");
 		}
@@ -85,6 +100,9 @@ StoreBase.prototype = {
 		}
 	},
 
+	/**
+	when external function no longer need to response to state change stream, unbind it by subscription returned from bindAction call earlier
+	*/
 	unBindAction(actSubs) {
 		if (!actSubs) { //prevent dispose all
 			console.warn("StoreBase: missing subscription argument.");
@@ -94,6 +112,9 @@ StoreBase.prototype = {
 		}
 	},
 
+	/**
+	start or stop state history recording for undo/redo
+	*/
 	enableUndoRedo(toEnable) {
 		if (toEnable) {
 			if (!this.undoRedoSub) {
@@ -108,6 +129,9 @@ StoreBase.prototype = {
 		}
 	},
 
+	/**
+	default action handler for default "UNDO_REDO" action
+	*/
 	onUndoRedo(payload) {
 		if (payload.data === "--") {
 			if (this._historyIndex > 0) {
@@ -126,6 +150,10 @@ StoreBase.prototype = {
 		}
 	},
 
+	/**
+	wipe the store state history, restart the history recoding either by a specified state or the very first initial state
+	useful for 'cancel' or 'reset' for container component
+	*/
 	resetStoreState(headState) {
 		this._historyIndex = 0;
 		this._storeState = headState || this._storeHistory[this._historyIndex];

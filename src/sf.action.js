@@ -24,6 +24,9 @@ function ActionBase(action_types, ext_methods) {
 ActionBase.prototype = {
 	constructor: ActionBase,
 
+	/**
+	dispatch action without dispatcher, all subscribers with the specific type will be selected and notified
+	*/
 	dispatch(actType, actData) {
 		if (!actType || typeof(actData) === "undefined") {
 			console.error("ActionBase: missing arguments", actType, actData);
@@ -36,6 +39,9 @@ ActionBase.prototype = {
 		}
 	},
 
+	/**
+	bind a function to an action type, returns subscription
+	*/
 	subscribe(actType, fn, context) {
 		if (!actType || !this.hasOwnProperty(actType)) {
 			console.error(`action type of ${actType} is not defined.`);
@@ -48,6 +54,9 @@ ActionBase.prototype = {
 			});
 	},
 
+	/**
+	dispose a subscription returned from subscrib call
+	*/
 	dispose(subscription) {
 		if (subscription) {
 			subscription.dispose();
