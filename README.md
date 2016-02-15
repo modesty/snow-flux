@@ -77,6 +77,32 @@ let PermAction = new SfAction({
 module.exports = PermAction;
 ```
 
+#### Dispatch an Action from React component:
+
+```javascript
+	renderLinkItems() {
+		return this.props.links.map( (item, idx) => {
+			let clsName = (this.props.align === 'left' && idx === 0) ? "btn btn-primary" : "icon-link-hover-handler";
+
+			return (
+				<li key={item.action} >
+					<div className={clsName} onClick={this.onAppLinksAction.bind(this, idx)}>
+						<a href="#">
+							<i className={"icon " + item.icon}></i><span> </span>{item.t_label}
+						</a>
+					</div>
+				</li>
+			);
+		});
+	},
+
+	onAppLinksAction(idx, evt) {
+		evt.preventDefault();
+		let actName = this.props.links[idx].action;
+		navBarAction.dispatch(navBarAction.ACTION, actName);
+	}
+```
+
 ### Store
 #### Createa store with [React Immutable Helper](https://facebook.github.io/react/docs/update.html) to localize all "t_label" properties when initializes:
 
@@ -170,6 +196,21 @@ let NavBarStore = new SfStore({
 );
 
 module.exports = NavBarStore;
+```
+
+#### Subscribe to store changes in top level (container component / higher order component / controller component) React component:
+
+```javascript
+	...
+	componentDidMount() {
+		this.stateSubs = navBarStore.subscribe( (stateData) => this.setState(stateData) );
+	},
+
+	componentWillUnmount() {
+		navBarStore.dispose(this.stateSubs);
+	},
+	...
+```
 
 ## More info
 
