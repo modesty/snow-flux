@@ -40,11 +40,140 @@ Here are some general technical considerations for snow-flux:
 
 ## Examples
 
-(to be added)
+### Actions
+#### Create a simple Action:
 
-## Test
+```javascript
+'use strict';
 
-(to be added)
+import { SfAction } from 'snow-flux';
+
+let NavBarAction = new SfAction({
+	ACTION: "NAV_BAR_ACTION", UNDO_REDO: "NAV_BAR_UNDO_REDO", REFRESH_APP: "REFRESH_APP"
+});
+
+module.exports = NavBarAction;
+```
+
+#### Create an Action with customized initialization method
+```javascript
+'use strict';
+
+import { SfAction } from 'snow-flux';
+
+let PermAction = new SfAction({
+	ACTION: "USER_ACTION", UNDO_REDO: "USER_UNDO_REDO",
+	UPDATE_ONE_RIGHT: "UPDATE_ONE_RIGHT",
+	UPDATE_ALL_PERM: "UPDATE_ALL_PERM", UPDATE_ONE_PERM: "UPDATE_ONE_PERM"
+}, {
+	init(httpRequest, scopeId) {
+		let getAppEndpoint =  "api/now/delegation/permission/list";
+		return httpRequest.get(getAppEndpoint).then(
+			response => response.data.result
+		);
+	}
+});
+
+module.exports = PermAction;
+```
+
+### Store
+#### Createa store with [React Immutable Helper](https://facebook.github.io/react/docs/update.html) to localize all "t_label" properties when initializes:
+
+```javascript
+'use strict';
+
+import reactUpdate from 'react/lib/update';
+import { SfStore } from 'snow-flux';
+import navBarAction from './navBarAction';
+
+let NavBarStore = new SfStore({
+		favorites: [
+			{t_label: "Create New", icon: "icon-add", action: "modal-createNew"}
+		],
+		searches: [
+			{t_label: "Go To", icon: "icon-search", action: "modal-goto"},
+			{t_label: "Search", icon: "icon-advanced-search", action: "modal-search"}
+		]
+	}, 
+	navBarAction, {
+		init(i18nFunc) {
+			// imperative initialization with i18n
+			function _translate(itemArray) {
+				return itemArray.map((item, idx, array) => {
+					return reactUpdate(item, {
+						label: {$set: i18nFunc(item.t_label)}
+					});
+				});
+			}
+
+			this._storeState = reactUpdate(this._storeState, {
+				favorites: {
+					$apply: _translate
+				},
+				searches: {
+					$apply: _translate
+				}
+			});
+
+			this.streamChange();
+		}
+	}
+);
+
+module.exports = NavBarStore;
+```
+
+
+#### Create a store with Action handlers:
+
+```javascript
+'use strict';
+
+import reactUpdate from 'react/lib/update';
+import { SfStore } from 'snow-flux';
+import navBarAction from './navBarAction';
+
+let NavBarStore = new SfStore({
+		favorites: [
+			{t_label: "Create New", icon: "icon-add", action: "modal-createNew"}
+		],
+		searches: [
+			{t_label: "Go To", icon: "icon-search", action: "modal-goto"},
+			{t_label: "Search", icon: "icon-advanced-search", action: "modal-search"}
+		]
+	}, 
+	navBarAction, {
+		init(i18nFunc) {
+			// imperative initialization with i18n
+			function _translate(itemArray) {
+				return itemArray.map((item, idx, array) => {
+					return reactUpdate(item, {
+						label: {$set: i18nFunc(item.t_label)}
+					});
+				});
+			}
+
+			this._storeState = reactUpdate(this._storeState, {
+				favorites: { $apply: _translate },
+				searches: { $apply: _translate }
+			});
+
+			this.registerAction(this.action, 'REFRESH_APP', this.onRefreshApp);
+
+			this.streamChange();
+		},
+		onRefreshApp(action) {
+			this.resetStoreState();
+		}
+	}
+);
+
+module.exports = NavBarStore;
+
+## More info
+
+More in depth discussion can be found at [Reactive Flux without Flux](http://www.codeproject.com/Articles/1063098/Reactive-Flux-without-Flux).
 
 ## Contribution
 
