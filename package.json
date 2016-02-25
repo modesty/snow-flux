@@ -1,6 +1,6 @@
 {
 	"name": "snow-flux",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"description": "snow-flux: A simple and practical unidirectional data flow implementation with Reactive Extensions RxJS.",
 	"main": "index.js",
 	"scripts": {

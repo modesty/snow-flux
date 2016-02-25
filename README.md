@@ -16,6 +16,11 @@ Or, install from GitHub:
 npm install modesty/snow-flux
 ```
 
+Then, build 'dist' as needed:
+```
+npm run gulp
+```
+
 ## Why Snow-Flux
 
 There are other [RxJS](https://github.com/Reactive-Extensions/RxJS) based Flux implementations in GitHub, [Reactive Flux without Flux](http://www.codeproject.com/Articles/1063098/Reactive-Flux-without-Flux) lists at least 5 in 'Overview' section. I'm building this module with the following goals and features:

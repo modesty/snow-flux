@@ -2,7 +2,7 @@
 
 import Rx from './sf.include';
 
-//when instantiating, needs to pass in "action_types", see ../menus/reactive.menubar.action for example
+//when instantiating, needs to pass in "action_types" dictionary, the constructor will create them as read-only property
 function ActionBase(action_types, ext_methods) {
 	//back rx subject, initialized to have empty type and data, if dispatched, will show error
 	this._actionSubject = new Rx.BehaviorSubject({type: "", data: null});

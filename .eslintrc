@@ -23,8 +23,5 @@
 		"jQuery": true,
 		"$": true
 	},
-	"parser": "babel-eslint",
-	"plugins": [
-		"react"
-	]
+	"parser": "babel-eslint"
 }
