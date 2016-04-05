@@ -1,6 +1,6 @@
 'use strict';
 
-import SfAction from './dist/sf.action';
-import SfStore from './dist/sf.store';
+const SfAction = require('./dist/sf.action');
+const SfStore = require('./dist/sf.store');
 
-module.exports = {SfAction, SfStore};
+module.exports = {Action: SfAction, Store: SfStore};
